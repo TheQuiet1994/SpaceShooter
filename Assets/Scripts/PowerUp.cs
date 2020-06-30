@@ -11,6 +11,7 @@ public class PowerUp : MonoBehaviour
     //1 = Speed
     //2 = Shields
     //3 = Ammo
+    //4 = Health
     [SerializeField]
     private int _powerupID;
     [SerializeField]
@@ -53,6 +54,9 @@ public class PowerUp : MonoBehaviour
                         break;
                     case 3:
                         player.AmmoBuff();
+                        break;
+                    case 4:
+                        player.HealthBuff();
                         break;
                     default:
                         break;

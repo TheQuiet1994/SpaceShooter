@@ -102,6 +102,38 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        switch (_health)
+        {
+            case 4:
+                _fire75.SetActive(false);
+                _fire50.SetActive(false);
+                _fire25.SetActive(false);
+                break;
+            case 3:
+                _fire75.SetActive(true);
+                _fire50.SetActive(false);
+                _fire25.SetActive(false);
+                break;
+
+            case 2:
+                _fire75.SetActive(true);
+                _fire50.SetActive(true);
+                _fire25.SetActive(false);
+                break;
+
+            case 1:
+                _fire75.SetActive(true);
+                _fire50.SetActive(true);
+                _fire25.SetActive(true);
+                break;
+
+            default:
+                _fire25.SetActive(false);
+                _fire50.SetActive(false);
+                _fire75.SetActive(false);
+                break;
+
+        }
         CalculateMovement();
         Shoot();     
     }  
@@ -186,27 +218,6 @@ public class Player : MonoBehaviour
         else
         {
             _health = _health - 1;
-            switch (_health)
-            {
-                case 3:
-                    _fire75.SetActive(true);
-                break;
-
-                case 2:
-                    _fire50.SetActive(true);
-                break;
-
-                case 1:
-                    _fire25.SetActive(true);
-                break;
-
-                default:
-                    _fire25.SetActive(false);
-                    _fire50.SetActive(false);
-                    _fire75.SetActive(false);
-                break;
-
-            }
             _uiManager.UpdateHealth(_health);
             if (_health <= 0)
             {
@@ -247,6 +258,14 @@ public class Player : MonoBehaviour
         {
             _laserAmmoCurrent = _laserAmmoMax;
             _uiManager.UpdateAmmo(_laserAmmoCurrent, _laserAmmoMax);
+        }
+    }
+    public void HealthBuff()
+    {
+        if (_health > 0)
+        {
+            _health += 1;
+            _uiManager.UpdateHealth(_health);
         }
     }
     public void ScoreUpdate(int points)
