@@ -7,13 +7,15 @@ public class Player : MonoBehaviour
     //Movement Speed
     [SerializeField]
     private float _speed = 5.5f;
+    [SerializeField]
+    private float _thrusterSpeed = 25.5f;
     
     //Fire Rate / Cooldown between attacks
     [SerializeField]
     private float _fireRate = 0.1f;
     private float _nextFire = -1f;
 
-    //Player health and Shield Health
+    //Player numbers
     [SerializeField]
     private int _health = 4;
     private int _shieldHP = 0;
@@ -33,6 +35,8 @@ public class Player : MonoBehaviour
     private GameObject _fire25 = null;
     [SerializeField]
     private GameObject _explosion = null;
+    [SerializeField]
+    private GameObject _sprintThruster = null;
 
     //Sound Effects
     [SerializeField]
@@ -104,7 +108,20 @@ public class Player : MonoBehaviour
         float verticalInput = Input.GetAxis("Vertical");
 
         Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
+
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            _speed = _thrusterSpeed;
+            _sprintThruster.SetActive(true);
+        }
+        else
+        {
+            _speed = 5.5f;
+            _sprintThruster.SetActive(false);
+        }
         transform.Translate(direction * _speed * Time.deltaTime);
+
+
 
         transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -3.8f, 0), 0);
 
@@ -183,12 +200,7 @@ public class Player : MonoBehaviour
     {
         _hasTripleShot = true;
         StartCoroutine(TripleShotPowerDownRoutine());
-    }
-    IEnumerator TripleShotPowerDownRoutine()
-    {
-        yield return new WaitForSeconds(5.0f);
-        _hasTripleShot = false;
-    }
+    } 
     public void SpeedBuffDuration()
     {
         if (_hasSpeedBuff == false)
@@ -198,13 +210,6 @@ public class Player : MonoBehaviour
             _fireRate = 0.2f;
             StartCoroutine(SpeedPowerDownRoutine());
         }        
-    }
-    IEnumerator SpeedPowerDownRoutine()
-    {
-        yield return new WaitForSeconds(5.0f);
-        _hasSpeedBuff = false;
-        _speed = 5.5f;
-        _fireRate = 0.5f;
     }
     public void ShieldBuff()
     {
@@ -221,5 +226,17 @@ public class Player : MonoBehaviour
     {
         _score += points;
         _uiManager.UpdateScore(_score);
+    }
+    IEnumerator TripleShotPowerDownRoutine()
+    {
+        yield return new WaitForSeconds(5.0f);
+        _hasTripleShot = false;
+    }
+    IEnumerator SpeedPowerDownRoutine()
+    {
+        yield return new WaitForSeconds(5.0f);
+        _hasSpeedBuff = false;
+        _speed = 5.5f;
+        _fireRate = 0.5f;
     }
 }
