@@ -19,6 +19,10 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _health = 4;
     private int _shieldHP = 0;
+    [SerializeField]
+    private int _laserAmmoCurrent = 15;
+    [SerializeField]
+    private int _laserAmmoMax = 15;
     
     //Prefabs for Effects
     [SerializeField]
@@ -141,17 +145,21 @@ public class Player : MonoBehaviour
     }
     void Shoot()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && Time.time > _nextFire)
+        if (Input.GetKeyDown(KeyCode.Space) && Time.time > _nextFire && _laserAmmoCurrent > 0)
         {
             _nextFire = Time.time + _fireRate;
             _audiosource.Play(0);
             if (_hasTripleShot == true)
             {
                 Instantiate(_tripleshotPrefab, transform.position + new Vector3(0f, 0f, 0), Quaternion.identity);
+                _laserAmmoCurrent -= 3;
+                _uiManager.UpdateAmmo(_laserAmmoCurrent, _laserAmmoMax);
             }
             else
             {
                 Instantiate(_laserPrefab, transform.position + new Vector3(0, 1.0f, 0), Quaternion.identity);
+                _laserAmmoCurrent -= 1;
+                _uiManager.UpdateAmmo(_laserAmmoCurrent, _laserAmmoMax);
             }           
         }
     }
