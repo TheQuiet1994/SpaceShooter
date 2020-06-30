@@ -881,6 +881,8 @@ MonoBehaviour:
   - {fileID: 3116518118224509201, guid: 296d5b42abbe7bf428a28cba3aa62fa5, type: 3}
   - {fileID: 7986936216048869256, guid: 6b71e56370f328145be8457c16231369, type: 3}
   - {fileID: 1837772256870943430, guid: 140ebb747b49d8d49956e9698af11d98, type: 3}
+  - {fileID: 4267828768247280411, guid: afa1411caf35eb2499fdb5129c253f1c, type: 3}
+  - {fileID: 4924783269284073553, guid: a45876c20e16c494eae3435c5bc25124, type: 3}
   _timeBeforeBuffs: 8
 --- !u!4 &803291393
 Transform:
@@ -2297,7 +2299,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1850603746}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -2.91, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children:
   - {fileID: 986993345}
@@ -2327,6 +2329,8 @@ MonoBehaviour:
   _health: 4
   _laserAmmoCurrent: 15
   _laserAmmoMax: 15
+  _multiLaserPrefab: {fileID: 5274752821830510225, guid: dee922ab0555a59448d97bc9b2a6f402,
+    type: 3}
   _laserPrefab: {fileID: 7141831233182397322, guid: a2b5442662e428c478535e6bde20e979,
     type: 3}
   _tripleshotPrefab: {fileID: 1288686539823110384, guid: 04ecc436a32fccc4db536b0353db450e,
@@ -2342,6 +2346,7 @@ MonoBehaviour:
   _hasTripleShot: 0
   _hasSpeedBuff: 0
   _hasShieldBuff: 0
+  _hasMultishot: 0
   _score: 0
 --- !u!1 &2045027982
 GameObject:

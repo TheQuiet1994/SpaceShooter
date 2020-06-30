@@ -49,7 +49,6 @@ public class Enemy : MonoBehaviour
             if (_mapLoops > 10)
             {
                 _speed = 0f;
-                Instantiate(_enemyDeath, transform.position + new Vector3(0f, 0f, 0), Quaternion.identity);
                 Destroy(this.gameObject);
             }          
         }

@@ -12,7 +12,6 @@ public class UIManager : MonoBehaviour
     private int _scoreRead = 0;
     [SerializeField]
     private Text _gameOver = null;
-    private Coroutine _lastRoutine = null;
     [SerializeField]
     private Image _healthImage = null;
     [SerializeField]
@@ -63,33 +62,13 @@ public class UIManager : MonoBehaviour
     {
         if (currentAmmo > 0)
         {
-            if (_coroutineRunning == true)
-            {
-                _ammoText.text = "Ammo: " + currentAmmo + " / " + maxammo;
-                StopCoroutine(_lastRoutine);
-            }
-            else if (_coroutineRunning == false)
-            {
-                _ammoText.text = "Ammo: " + currentAmmo + " / " + maxammo;
-            }
-            
+            _ammoText.text = "Ammo: " + currentAmmo + " / " + maxammo;
         }
         else if (currentAmmo == 0)
         {
             _ammoText.text = "OUT OF AMMO!";
-            _lastRoutine = StartCoroutine(FlickerOutofAmmo());
         }
         
-    }
-    IEnumerator FlickerOutofAmmo()
-    {
-        while (true)
-        {
-            _ammoText.gameObject.SetActive(false);
-            yield return new WaitForSeconds(0.5f);
-            _ammoText.gameObject.SetActive(true);
-            yield return new WaitForSeconds(0.5f);
-        }
     }
     IEnumerator FlickerGameOver()
     {

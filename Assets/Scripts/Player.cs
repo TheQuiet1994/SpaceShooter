@@ -23,8 +23,10 @@ public class Player : MonoBehaviour
     private int _laserAmmoCurrent = 15;
     [SerializeField]
     private int _laserAmmoMax = 15;
-    
+
     //Prefabs for Effects
+    [SerializeField]
+    private GameObject _multiLaserPrefab = null;
     [SerializeField]
     private GameObject _laserPrefab = null;
     [SerializeField]
@@ -55,6 +57,8 @@ public class Player : MonoBehaviour
     private bool _hasSpeedBuff = false;
     [SerializeField]
     private bool _hasShieldBuff = false;
+    [SerializeField]
+    private bool _hasMultishot = false;
 
     //Manager initialization
     private SpawnManager _spawnManager;
@@ -189,10 +193,16 @@ public class Player : MonoBehaviour
                     _laserAmmoCurrent -= 3;
                     _uiManager.UpdateAmmo(_laserAmmoCurrent, _laserAmmoMax);
                 }
-                else
+            }
+            else if (_hasMultishot == true)
+            {
+                if (_laserAmmoCurrent > 6)
                 {
-
-                }
+                    _audiosource.Play(0);
+                    Instantiate(_multiLaserPrefab, transform.position + new Vector3(0, 1.0f, 0), Quaternion.identity);
+                    _laserAmmoCurrent -= 6;
+                    _uiManager.UpdateAmmo(_laserAmmoCurrent, _laserAmmoMax);
+                }  
             }
             else
             {
@@ -230,6 +240,8 @@ public class Player : MonoBehaviour
     }
     public void TripleShotBuffDuration()
     {
+        _laserAmmoCurrent = 15;
+        _uiManager.UpdateAmmo(_laserAmmoCurrent, _laserAmmoMax);
         _hasTripleShot = true;
         StartCoroutine(TripleShotPowerDownRoutine());
     } 
@@ -262,7 +274,7 @@ public class Player : MonoBehaviour
     }
     public void HealthBuff()
     {
-        if (_health > 0)
+        if (_health > 0 && _health < 4)
         {
             _health += 1;
             _uiManager.UpdateHealth(_health);
@@ -272,6 +284,13 @@ public class Player : MonoBehaviour
     {
         _score += points;
         _uiManager.UpdateScore(_score);
+    }
+    public void MultishotBuff()
+    {
+        _laserAmmoCurrent = 15;
+        _uiManager.UpdateAmmo(_laserAmmoCurrent, _laserAmmoMax);
+        _hasMultishot = true;
+        StartCoroutine(MultiShotPowerDownRoutine());
     }
     IEnumerator TripleShotPowerDownRoutine()
     {
@@ -284,5 +303,10 @@ public class Player : MonoBehaviour
         _hasSpeedBuff = false;
         _speed = 5.5f;
         _fireRate = 0.5f;
+    }
+    IEnumerator MultiShotPowerDownRoutine()
+    {
+        yield return new WaitForSeconds(5.0f);
+        _hasMultishot = false;
     }
 }

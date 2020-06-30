@@ -17,6 +17,7 @@ public class SpawnManager : MonoBehaviour
     private bool _buffsEnabled = false;
     private bool _stopSpawning = false;
     private bool _gameStarted = false;
+    private int _rareSpawnCounts = 0;
 
     void Start()
     {
@@ -47,10 +48,27 @@ public class SpawnManager : MonoBehaviour
     {
         while (_stopSpawning == false)
         {
-            int powToSpawn = Random.Range(0, 5);
-            Vector3 posToSpawn = new Vector3(Random.Range(-9.62f, 9.58f), 7.0f, 0);   
-            Instantiate(powerups[powToSpawn], posToSpawn, Quaternion.identity);
-            yield return new WaitForSeconds(Random.Range(10f, 15f));
+            int powToSpawn = Random.Range(1, 6);
+            if (powToSpawn == 5)
+            {
+                _rareSpawnCounts += 1;
+                yield return new WaitForSeconds(Random.Range(10f, 15f));
+                if (_rareSpawnCounts >= 5)
+                {
+                    Vector3 posToSpawn = new Vector3(Random.Range(-9.62f, 9.58f), 7.0f, 0);
+                    _rareSpawnCounts = 0;
+                    Instantiate(powerups[powToSpawn], posToSpawn, Quaternion.identity);
+                    yield return new WaitForSeconds(Random.Range(10f, 15f));
+                }
+            }
+            else
+            {
+                //Debug.Log(powToSpawn); //For Debugging
+                Vector3 posToSpawn = new Vector3(Random.Range(-9.62f, 9.58f), 7.0f, 0);
+                Instantiate(powerups[powToSpawn], posToSpawn, Quaternion.identity);
+                yield return new WaitForSeconds(Random.Range(10f, 15f));
+            }
+                           
         }
     }
 
