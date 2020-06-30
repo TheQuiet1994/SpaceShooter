@@ -109,12 +109,17 @@ public class Player : MonoBehaviour
 
         Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
 
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetKey(KeyCode.LeftShift) && _hasSpeedBuff == false)
         {
             _speed = _thrusterSpeed;
             _sprintThruster.SetActive(true);
         }
-        else
+        else if (_hasSpeedBuff == true)
+        {
+            _speed = 10f;
+            _sprintThruster.SetActive(false);
+        }
+        else if (_hasSpeedBuff == false)
         {
             _speed = 5.5f;
             _sprintThruster.SetActive(false);
@@ -206,7 +211,6 @@ public class Player : MonoBehaviour
         if (_hasSpeedBuff == false)
         {
             _hasSpeedBuff = true;
-            _speed = 10f;
             _fireRate = 0.2f;
             StartCoroutine(SpeedPowerDownRoutine());
         }        
@@ -216,7 +220,7 @@ public class Player : MonoBehaviour
         if (_hasShieldBuff == false)
         {
             _hasShieldBuff = true;
-            _shieldHP = 2;
+            _shieldHP = 3;
             _uiManager.UpdateShields(_shieldHP);
             _shields.SetActive(true);
         }

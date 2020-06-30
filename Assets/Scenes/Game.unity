@@ -1574,6 +1574,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 16037f371f777ec42add074a7549aa9f, type: 3}
   - {fileID: 21300000, guid: 647918f2793341a4cad5d131927175b9, type: 3}
   _shieldStates:
+  - {fileID: 21300000, guid: 40819eab8dc39c6438205885401e1856, type: 3}
   - {fileID: 21300000, guid: f600d38bd7a9999449df023d35430d44, type: 3}
   - {fileID: 21300000, guid: 9f8c6f8660b4e3f4eb86a778fe19253b, type: 3}
   - {fileID: 21300000, guid: b1b8fee61fecd874a8660f1072da3aae, type: 3}
@@ -2417,7 +2418,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: f600d38bd7a9999449df023d35430d44, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 40819eab8dc39c6438205885401e1856, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
