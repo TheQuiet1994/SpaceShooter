@@ -47,6 +47,8 @@ public class Player : MonoBehaviour
     private GameObject _fire25 = null;
     [SerializeField]
     private GameObject _explosion = null;
+    [SerializeField]
+    private CameraShake camerashake;
 
     //Sound Effects
     [SerializeField]
@@ -283,8 +285,9 @@ public class Player : MonoBehaviour
         {
             _currentHealth -= 1;
             _healthbar.SetHealth(_currentHealth);
+            StartCoroutine(camerashake.Shake(.15f, .2f));
             if (_currentHealth <= 0)
-            {
+            {         
                 _spawnManager.OnPlayerDeath();
                 Instantiate(_explosion, transform.position + new Vector3(0f, 0f, 0), Quaternion.identity);
                 _gameManager.GameOver();

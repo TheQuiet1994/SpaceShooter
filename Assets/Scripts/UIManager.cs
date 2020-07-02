@@ -11,6 +11,8 @@ public class UIManager : MonoBehaviour
     private Text _ammoText = null;
     [SerializeField]
     private Text _gameOver = null;
+    [SerializeField]
+    private CameraShake camerashake;
 
     void Start()
     {
@@ -26,6 +28,7 @@ public class UIManager : MonoBehaviour
     }
     public void GameOverSequence()
     {
+        StartCoroutine(camerashake.Shake(.8f, .7f));
         _gameOver.gameObject.SetActive(true);
         StartCoroutine(FlickerGameOver());
     }
