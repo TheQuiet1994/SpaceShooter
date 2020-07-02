@@ -17,12 +17,18 @@ public class Player : MonoBehaviour
 
     //Player numbers
     [SerializeField]
-    private int _health = 4;
+    private int _currentHealth = 4;
+    [SerializeField]
+    private int _maxHealth = 4;
     private int _shieldHP = 0;
     [SerializeField]
     private int _laserAmmoCurrent = 15;
     [SerializeField]
     private int _laserAmmoMax = 15;
+    [SerializeField]
+    private float _energy = 5f;
+    [SerializeField]
+    private float _maxEnergy = 5f;
 
     //Prefabs for Effects
     [SerializeField]
@@ -41,8 +47,6 @@ public class Player : MonoBehaviour
     private GameObject _fire25 = null;
     [SerializeField]
     private GameObject _explosion = null;
-    [SerializeField]
-    private GameObject _sprintThruster = null;
 
     //Sound Effects
     [SerializeField]
@@ -59,6 +63,9 @@ public class Player : MonoBehaviour
     private bool _hasShieldBuff = false;
     [SerializeField]
     private bool _hasMultishot = false;
+    [SerializeField]
+    private bool _isThrusting = false;
+    private bool _thrusterCooldownPunish = false;
 
     //Manager initialization
     private SpawnManager _spawnManager;
@@ -69,6 +76,12 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _score;
     private bool _isGameOver;
+    [SerializeField]
+    private HealthBar _healthbar;
+    [SerializeField]
+    private HealthBar _shieldbar;
+    [SerializeField]
+    private EnergyBar _energybar;
 
 
 
@@ -78,6 +91,11 @@ public class Player : MonoBehaviour
         _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
+        _currentHealth = _maxHealth;
+        _healthbar.SetHealth(_currentHealth);
+        _shieldbar.SetHealth(_shieldHP);
+        _energybar.SetEnergy(_energy);
+        _energybar.SetMaxEnergy(_maxEnergy);
 
         if (_spawnManager == null)
         {
@@ -103,10 +121,9 @@ public class Player : MonoBehaviour
             Debug.LogError("The Game Manager is NULL.");
         }
     }
-
     void Update()
     {
-        switch (_health)
+        switch (_currentHealth)
         {
             case 4:
                 _fire75.SetActive(false);
@@ -140,8 +157,7 @@ public class Player : MonoBehaviour
         }
         CalculateMovement();
         Shoot();     
-    }  
-    
+    }   
     void CalculateMovement()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
@@ -149,26 +165,64 @@ public class Player : MonoBehaviour
 
         Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
 
+        //Thruster and Speed Buff Movement System
         if (Input.GetKey(KeyCode.LeftShift) && _hasSpeedBuff == false)
         {
+            _isThrusting = true;
+        }
+        if (Input.GetKeyUp(KeyCode.LeftShift) && _hasSpeedBuff == false)
+        {
+            _isThrusting = false;
+            _speed = 5.5f;
+        }
+        if (_energy > 0 && _thrusterCooldownPunish == false && _isThrusting == false)
+        {
+            _energy += Time.deltaTime;
+            _energybar.SetEnergy(_energy);
+            if (_energy >= 5)
+            {
+                _energy = 5f;
+                _energybar.SetEnergy(_energy);
+            }
+        }
+        else if (_isThrusting == true && _thrusterCooldownPunish == false)
+        {
             _speed = _thrusterSpeed;
-            _sprintThruster.SetActive(true);
+            if (_energy > 0 && _thrusterCooldownPunish == false)
+            {
+                _energy -= Time.deltaTime;
+                _energybar.SetEnergy(_energy);
+                if (_energy <= 0)
+                {
+                    _isThrusting = false;
+                    _speed = 5.5f;
+                    StartCoroutine(ThrusterCooldownPunish());
+                }
+            }
         }
         else if (_hasSpeedBuff == true)
         {
             _speed = 10f;
-            _sprintThruster.SetActive(false);
         }
         else if (_hasSpeedBuff == false)
         {
             _speed = 5.5f;
-            _sprintThruster.SetActive(false);
         }
+        if (_thrusterCooldownPunish == true)
+        {
+            _energy += Time.deltaTime;
+            _energybar.SetEnergy(_energy);
+            if (_energy >= 5)
+            {
+                _thrusterCooldownPunish = false;
+                _energy = 5f;
+                _energybar.SetEnergy(_energy);
+            }
+        }
+
+        //Movement System
         transform.Translate(direction * _speed * Time.deltaTime);
-
-
-
-        transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -3.8f, 0), 0);
+        transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -2.3f, 0), 0);
 
         if (transform.position.x > 10.5f)
         {
@@ -218,7 +272,7 @@ public class Player : MonoBehaviour
         if (_shieldHP > 0)
         {
             _shieldHP = _shieldHP - 1;
-            _uiManager.UpdateShields(_shieldHP);
+            _shieldbar.SetHealth(_shieldHP);
             if (_shieldHP <= 0 && _hasShieldBuff == true)
             {
                 _hasShieldBuff = false;
@@ -227,13 +281,14 @@ public class Player : MonoBehaviour
         }
         else
         {
-            _health = _health - 1;
-            _uiManager.UpdateHealth(_health);
-            if (_health <= 0)
+            _currentHealth -= 1;
+            _healthbar.SetHealth(_currentHealth);
+            if (_currentHealth <= 0)
             {
                 _spawnManager.OnPlayerDeath();
                 Instantiate(_explosion, transform.position + new Vector3(0f, 0f, 0), Quaternion.identity);
                 _gameManager.GameOver();
+                _uiManager.GameOverSequence();
                 Destroy(this.gameObject);
             }
         }     
@@ -260,7 +315,7 @@ public class Player : MonoBehaviour
         {
             _hasShieldBuff = true;
             _shieldHP = 3;
-            _uiManager.UpdateShields(_shieldHP);
+            _shieldbar.SetHealth(_shieldHP);
             _shields.SetActive(true);
         }
     }
@@ -274,10 +329,10 @@ public class Player : MonoBehaviour
     }
     public void HealthBuff()
     {
-        if (_health > 0 && _health < 4)
+        if (_currentHealth > 0 && _currentHealth != _maxHealth)
         {
-            _health += 1;
-            _uiManager.UpdateHealth(_health);
+            _currentHealth += 1;
+            _healthbar.SetHealth(_currentHealth);
         }
     }
     public void ScoreUpdate(int points)
@@ -308,5 +363,10 @@ public class Player : MonoBehaviour
     {
         yield return new WaitForSeconds(5.0f);
         _hasMultishot = false;
+    }
+    IEnumerator ThrusterCooldownPunish()
+    {
+        _thrusterCooldownPunish = true;
+        yield return new WaitForSeconds(5f);
     }
 }

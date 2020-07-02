@@ -9,20 +9,8 @@ public class UIManager : MonoBehaviour
     private Text _scoreText = null;
     [SerializeField]
     private Text _ammoText = null;
-    private int _scoreRead = 0;
     [SerializeField]
     private Text _gameOver = null;
-    [SerializeField]
-    private Image _healthImage = null;
-    [SerializeField]
-    private Image _shieldImage = null;
-    [SerializeField]
-    private Sprite[] _healthstates = null;
-    [SerializeField]
-    private Sprite[] _shieldStates = null;
-    private bool _coroutineRunning = false;
-
-    private bool _gameisOver = false;
 
     void Start()
     {
@@ -36,28 +24,11 @@ public class UIManager : MonoBehaviour
     {
         _scoreText.text = "Score: " + playerScore;
     }
-
-    public void UpdateHealth(int currentHealth)
-    {
-        _healthImage.sprite = _healthstates[currentHealth];
-
-        if (currentHealth == 0)
-        {
-            GameOverSequence();
-        }
-    }
-
     public void GameOverSequence()
     {
         _gameOver.gameObject.SetActive(true);
         StartCoroutine(FlickerGameOver());
     }
-
-    public void UpdateShields(int currentShields)
-    {
-        _shieldImage.sprite = _shieldStates[currentShields];
-    }
-
     public void UpdateAmmo(int currentAmmo, int maxammo)
     {
         if (currentAmmo > 0)
