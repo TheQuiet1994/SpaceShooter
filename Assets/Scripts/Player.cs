@@ -202,7 +202,7 @@ public class Player : MonoBehaviour
                 }
             }
         }
-        else if (_hasSpeedBuff == true)
+        if (_hasSpeedBuff == true)
         {
             _speed = 10f;
         }
