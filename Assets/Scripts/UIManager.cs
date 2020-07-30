@@ -12,6 +12,8 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Text _gameOver = null;
     [SerializeField]
+    private Text _currentWave = null;
+    [SerializeField]
     private CameraShake camerashake;
 
     void Start()
@@ -19,6 +21,7 @@ public class UIManager : MonoBehaviour
         _gameOver.gameObject.SetActive(false);
         _scoreText.text = "Score: " + 0;
         _ammoText.text = "Ammo: " + 15 + " / " + 15;
+        _currentWave.text = "Current Wave: " + 0;
     }
 
 
@@ -42,7 +45,10 @@ public class UIManager : MonoBehaviour
         {
             _ammoText.text = "OUT OF AMMO!";
         }
-        
+    }
+    public void UpdateWave(int currentWave)
+    {
+            _currentWave.text = "Current Wave: " + currentWave;
     }
     IEnumerator FlickerGameOver()
     {

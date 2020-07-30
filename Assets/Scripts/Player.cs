@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _speed = 5.5f;
     [SerializeField]
-    private float _thrusterSpeed = 25.5f;
+    private float _thrusterSpeed = 8.5f;
     
     //Fire Rate / Cooldown between attacks
     [SerializeField]
@@ -77,7 +77,6 @@ public class Player : MonoBehaviour
     //UI Initializaiton
     [SerializeField]
     private int _score;
-    private bool _isGameOver;
     [SerializeField]
     private HealthBar _healthbar;
     [SerializeField]
@@ -91,7 +90,7 @@ public class Player : MonoBehaviour
     {
         _audiosource = GetComponent<AudioSource>();
         _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+        _uiManager = GameObject.Find("MainUI").GetComponent<UIManager>();
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
         _currentHealth = _maxHealth;
         _healthbar.SetHealth(_currentHealth);
@@ -164,30 +163,20 @@ public class Player : MonoBehaviour
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
-
         Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
 
         //Thruster and Speed Buff Movement System
         if (Input.GetKey(KeyCode.LeftShift) && _hasSpeedBuff == false)
         {
             _isThrusting = true;
+            _speed = _thrusterSpeed;
         }
         if (Input.GetKeyUp(KeyCode.LeftShift) && _hasSpeedBuff == false)
         {
             _isThrusting = false;
             _speed = 5.5f;
         }
-        if (_energy > 0 && _thrusterCooldownPunish == false && _isThrusting == false)
-        {
-            _energy += Time.deltaTime;
-            _energybar.SetEnergy(_energy);
-            if (_energy >= 5)
-            {
-                _energy = 5f;
-                _energybar.SetEnergy(_energy);
-            }
-        }
-        else if (_isThrusting == true && _thrusterCooldownPunish == false)
+        if (_isThrusting == true)
         {
             _speed = _thrusterSpeed;
             if (_energy > 0 && _thrusterCooldownPunish == false)
@@ -202,13 +191,15 @@ public class Player : MonoBehaviour
                 }
             }
         }
-        if (_hasSpeedBuff == true)
+        if (_energy > 0 && _thrusterCooldownPunish == false && _isThrusting == false)
         {
-            _speed = 10f;
-        }
-        else if (_hasSpeedBuff == false)
-        {
-            _speed = 5.5f;
+            _energy += Time.deltaTime;
+            _energybar.SetEnergy(_energy);
+            if (_energy >= 5)
+            {
+                _energy = 5f;
+                _energybar.SetEnergy(_energy);
+            }
         }
         if (_thrusterCooldownPunish == true)
         {
@@ -309,12 +300,13 @@ public class Player : MonoBehaviour
         {
             _hasSpeedBuff = true;
             _fireRate = 0.2f;
+            _speed = 12.5f;
             StartCoroutine(SpeedPowerDownRoutine());
         }        
     }
     public void ShieldBuff()
     {
-        if (_hasShieldBuff == false)
+        if (_hasShieldBuff == false || _shieldHP < 3)
         {
             _hasShieldBuff = true;
             _shieldHP = 3;

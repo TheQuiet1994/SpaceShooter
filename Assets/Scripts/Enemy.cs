@@ -10,17 +10,17 @@ public class Enemy : MonoBehaviour
     private float _canFire = -1f;
     [SerializeField]
     private float _speed = 4.0f;
-    private int _mapLoops = 0;
     private bool _isDead;
     private Player _player;
     [SerializeField]
     private GameObject _enemyDeath;
+    private SpawnManager _spawnManager = null;
 
     void Start()
     {
+        _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
         _player = GameObject.Find("Player").GetComponent<Player>();
     }
-
     void Update()
     {
         transform.Translate(Vector3.down * _speed * Time.deltaTime); //Basic Movement
@@ -39,21 +39,13 @@ public class Enemy : MonoBehaviour
         LeaveMap();
         
     }
-
     private void LeaveMap()
     {
         if (transform.position.y < -6)
         {
-            transform.position = new Vector3(Random.Range(-8.0f, 8.0f), 7.3f, 0);
-            _mapLoops = _mapLoops + 1;
-            if (_mapLoops > 10)
-            {
-                _speed = 0f;
-                Destroy(this.gameObject);
-            }          
+            transform.position = new Vector3(Random.Range(-8.0f, 8.0f), 7.3f, 0);       
         }
     }
-
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag == ("Player"))
@@ -62,11 +54,14 @@ public class Enemy : MonoBehaviour
             if (player != null && _isDead != true)
             {
                 _isDead = true;
+                _player.ScoreUpdate(Random.Range(10, 16));
                 player.Damage();
             }
             _speed = 0f;
+            _spawnManager.OnEnemyDeath();
             Instantiate(_enemyDeath, transform.position + new Vector3(0f, 0f, 0), Quaternion.identity);
             Destroy(this.gameObject);
+            
         }
 
         if (other.tag == ("Laser"))
@@ -78,6 +73,7 @@ public class Enemy : MonoBehaviour
                 _player.ScoreUpdate(Random.Range(10, 16));
             }
             _speed = 0f;
+            _spawnManager.OnEnemyDeath();
             Instantiate(_enemyDeath, transform.position + new Vector3(0f, 0f, 0), Quaternion.identity);
             Destroy(this.gameObject);
         }
