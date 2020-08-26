@@ -7,6 +7,8 @@ public class SpawnManager : MonoBehaviour
 
 {
     [SerializeField]
+    private GameObject _boss;
+    [SerializeField]
     private GameObject _enemy;
     [SerializeField]
     private GameObject _enemyContainer;
@@ -17,7 +19,7 @@ public class SpawnManager : MonoBehaviour
 
     private bool _buffsEnabled = false;
     private bool _stopSpawning = false;
-    private bool _gameStarted = false;
+    public bool _gameStarted = false;
     private int _rareSpawnCounts = 0;
     private int _currentWave = 0;
     private int _numberofEnemiesSpawned = 0;
@@ -66,7 +68,7 @@ public class SpawnManager : MonoBehaviour
         _currentEnemies = _currentWave * 5;
         _numberofEnemiesSpawned = 0;
         _uiManager.UpdateWave(_currentWave);
-        if (_currentWave != 10)
+        if (_currentWave != 5)
         {
             while (_numberofEnemiesSpawned < (_currentWave * 5) && _stopSpawning == false)
             {
@@ -76,6 +78,12 @@ public class SpawnManager : MonoBehaviour
                 _numberofEnemiesSpawned += 1;
                 yield return new WaitForSeconds(3.0f);
             }
+        }
+        else if (_currentWave == 5)
+        {
+            Debug.Log("Boss wave!");
+            Vector3 posToSpawn = new Vector3(Random.Range(-7.44f, 7.47f), 10.7f, 0);
+            GameObject newBoss = Instantiate(_boss, posToSpawn, Quaternion.identity);
         }
             
     }

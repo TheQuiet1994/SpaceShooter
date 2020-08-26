@@ -6,20 +6,21 @@ public class LaserBehavior : MonoBehaviour
 {
     [SerializeField]
     private float _speed = 10.0f;
-    private bool _isPlayerLaser = true;
+    public bool _isPlayerLaser = true;
     [SerializeField]
     private GameObject _explosion = null;
+    public bool _isBossLaser = false;
 
     void Update()
     {
         if (_isPlayerLaser == false)
-        {
+        { 
             MoveDown();
         }
-        else
+        else if (_isPlayerLaser == true)
         {
             MoveUp();     
-        }     
+        }
     }
 
     void MoveUp()
@@ -54,9 +55,30 @@ public class LaserBehavior : MonoBehaviour
             }
         }
     }
+    void MoveForward()
+    {
+        transform.Translate(Vector3.right * _speed * Time.deltaTime);
+        if (transform.position.y <= -8f)
+        {
+            if (transform.parent != null)
+            {
+                Destroy(this.gameObject, 3f);
+                Destroy(transform.parent.gameObject, 3f);
+            }
+            else
+            {
+                Destroy(this.gameObject, 3f);
+            }
+        }
+    }
     public void AssignEnemy()
     {
         _isPlayerLaser = false;
+    }
+    public void AssignBoss()
+    {
+        _isPlayerLaser = false;
+        _isBossLaser = true;
     }
 
     private void OnTriggerEnter2D(Collider2D other)

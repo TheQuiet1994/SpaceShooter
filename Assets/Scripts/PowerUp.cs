@@ -13,6 +13,7 @@ public class PowerUp : MonoBehaviour
     //3 = Ammo
     //4 = Health
     //5 = Multishot
+    //6 = Stall (Negative)
     [SerializeField]
     private int _powerupID;
     [SerializeField]
@@ -61,6 +62,8 @@ public class PowerUp : MonoBehaviour
                         break;
                     case 5: 
                         player.MultishotBuff();
+                        break;
+                    case 6: player.StallBuff();
                         break;
                     default:
                         break;

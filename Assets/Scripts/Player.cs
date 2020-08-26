@@ -22,15 +22,17 @@ public class Player : MonoBehaviour
     private int _maxHealth = 4;
     private int _shieldHP = 0;
     [SerializeField]
-    private int _laserAmmoCurrent = 15;
+    private int _laserAmmoCurrent = 25;
     [SerializeField]
-    private int _laserAmmoMax = 15;
+    private int _laserAmmoMax = 25;
     [SerializeField]
     private float _energy = 5f;
     [SerializeField]
     private float _maxEnergy = 5f;
 
     //Prefabs for Effects
+    [SerializeField]
+    private bool _canFire = true;
     [SerializeField]
     private GameObject _multiLaserPrefab = null;
     [SerializeField]
@@ -47,6 +49,8 @@ public class Player : MonoBehaviour
     private GameObject _fire25 = null;
     [SerializeField]
     private GameObject _explosion = null;
+    [SerializeField]
+    private GameObject _sprintThruster = null;
     [SerializeField]
     private CameraShake camerashake;
 
@@ -161,19 +165,17 @@ public class Player : MonoBehaviour
     }   
     void CalculateMovement()
     {
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
-        Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
-
         //Thruster and Speed Buff Movement System
-        if (Input.GetKey(KeyCode.LeftShift) && _hasSpeedBuff == false)
+        if (Input.GetKey(KeyCode.LeftShift) && _hasSpeedBuff == false && _thrusterCooldownPunish == false)
         {
             _isThrusting = true;
+            _sprintThruster.SetActive(true);
             _speed = _thrusterSpeed;
         }
-        if (Input.GetKeyUp(KeyCode.LeftShift) && _hasSpeedBuff == false)
+        if (Input.GetKeyUp(KeyCode.LeftShift) && _hasSpeedBuff == false && _thrusterCooldownPunish == false)
         {
             _isThrusting = false;
+            _sprintThruster.SetActive(false);
             _speed = 5.5f;
         }
         if (_isThrusting == true)
@@ -214,8 +216,13 @@ public class Player : MonoBehaviour
         }
 
         //Movement System
+
+        float horizontalInput = Input.GetAxis("Horizontal");
+        float verticalInput = Input.GetAxis("Vertical");
+        Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
+
         transform.Translate(direction * _speed * Time.deltaTime);
-        transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -2.3f, 0), 0);
+        transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -2.74f, 5.08f), 0);
 
         if (transform.position.x > 10.5f)
         {
@@ -228,7 +235,7 @@ public class Player : MonoBehaviour
     }
     void Shoot()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && Time.time > _nextFire && _laserAmmoCurrent > 0)
+        if (Input.GetKeyDown(KeyCode.Space) && Time.time > _nextFire && _laserAmmoCurrent > 0 && _canFire == true)
         {
             _nextFire = Time.time + _fireRate;
             if (_hasTripleShot == true)
@@ -255,8 +262,11 @@ public class Player : MonoBehaviour
             {
                 _audiosource.Play(0);
                 Instantiate(_laserPrefab, transform.position + new Vector3(0, 1.0f, 0), Quaternion.identity);
-                _laserAmmoCurrent -= 1;
-                _uiManager.UpdateAmmo(_laserAmmoCurrent, _laserAmmoMax);
+                if (_spawnManager._gameStarted == true)
+                {
+                    _laserAmmoCurrent -= 1;
+                    _uiManager.UpdateAmmo(_laserAmmoCurrent, _laserAmmoMax);
+                }
             }           
         }
     }
@@ -289,7 +299,7 @@ public class Player : MonoBehaviour
     }
     public void TripleShotBuffDuration()
     {
-        _laserAmmoCurrent = 15;
+        _laserAmmoCurrent = _laserAmmoMax;
         _uiManager.UpdateAmmo(_laserAmmoCurrent, _laserAmmoMax);
         _hasTripleShot = true;
         StartCoroutine(TripleShotPowerDownRoutine());
@@ -337,10 +347,22 @@ public class Player : MonoBehaviour
     }
     public void MultishotBuff()
     {
-        _laserAmmoCurrent = 15;
+        _laserAmmoCurrent = _laserAmmoMax;
         _uiManager.UpdateAmmo(_laserAmmoCurrent, _laserAmmoMax);
         _hasMultishot = true;
         StartCoroutine(MultiShotPowerDownRoutine());
+    }
+    public void StallBuff()
+    {
+        _canFire = false;
+        StartCoroutine(StallCooldownPunish());
+    }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.tag == ("BossBeam"))
+        {
+            Damage();
+        }
     }
     IEnumerator TripleShotPowerDownRoutine()
     {
@@ -363,5 +385,10 @@ public class Player : MonoBehaviour
     {
         _thrusterCooldownPunish = true;
         yield return new WaitForSeconds(5f);
+    }
+    IEnumerator StallCooldownPunish()
+    {
+        yield return new WaitForSeconds(5f);
+        _canFire = true;
     }
 }
